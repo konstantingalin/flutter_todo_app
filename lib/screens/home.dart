@@ -26,13 +26,13 @@ class Home extends StatelessWidget {
                     children: [
                       Container(
                         margin: const EdgeInsets.only(
-                          top: 50,
-                          bottom: 20,
+                          top: 40,
+                          bottom: 16,
                         ),
                         child: const Text(
-                          'Все дела',
+                          'Список дел',
                           style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.w500),
+                              fontSize: 24, fontWeight: FontWeight.w500),
                         ),
                       ),
                       for (ToDo todo in todosList)
