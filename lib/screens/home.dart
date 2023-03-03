@@ -4,10 +4,22 @@ import 'package:flutter_todo_app/widgets/todo_item.dart';
 
 import '../model/todo.dart';
 
-class Home extends StatelessWidget {
-  Home({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState()=> _HomeState();  
+}
+class _HomeState extends State<Home> {
 
   final todosList = ToDo.todoList();
+  List<ToDo> _foundToDO = []; 
+  final _todoController = TextEditingController();
+
+  @override void initState() {
+    _foundToDO = todosList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +47,21 @@ class Home extends StatelessWidget {
                               fontSize: 24, fontWeight: FontWeight.w500),
                         ),
                       ),
-                      for (ToDo todo in todosList)
-                        ToDoItem(
-                          todo: todo,
+                      if(_foundToDO.isEmpty)
+                        const Text(
+                          'Пусто', 
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 122, 122, 122),
+                          ),
                         )
+                      else
+                        for (ToDo todo in _foundToDO.reversed)
+                          ToDoItem(
+                            todo: todo,
+                            onToDoChaged: _handleToDoChange,
+                            onDeleteItem: _deleteToDoItem,
+                          )
                     ],
                   ),
                 ),
@@ -72,8 +95,9 @@ class Home extends StatelessWidget {
                     ],
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const TextField(
-                    decoration: InputDecoration(
+                  child: TextField(
+                    controller: _todoController,
+                    decoration: const InputDecoration(
                       hintText: 'Новая задача',
                       border: InputBorder.none,
                     ),
@@ -83,7 +107,9 @@ class Home extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.only(bottom: 20, right: 20),
                 child: ElevatedButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    _addToDoItem(_todoController.text);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: tdBlue,
                     minimumSize: const Size(60, 60),
@@ -99,6 +125,45 @@ class Home extends StatelessWidget {
     );
   }
 
+  void _handleToDoChange(ToDo todo) {
+    setState(() {
+      todo.isDone = !todo.isDone;
+    });
+  }
+
+  void _deleteToDoItem(String id) {
+    setState(() {
+      todosList.removeWhere((item) => item.id == id);
+    });
+  }
+
+  void _addToDoItem(String toDo) {
+    setState(() {
+      if(toDo.isNotEmpty) {
+        todosList.add(ToDo(id: DateTime.now().millisecond.toString(), todoText: toDo));
+      }
+    });
+
+    _todoController.clear();
+  }
+
+  void _runFilter(String enteredKeyward){
+    List<ToDo> result = [];
+    if (enteredKeyward.length < 2) {
+      result = todosList;
+    } else {
+      result = todosList
+        .where((item) => item.todoText!
+          .toLowerCase()
+          .contains(enteredKeyward.toLowerCase()))
+        .toList();
+    }
+
+    setState(() {
+      _foundToDO = result;
+    });
+  }
+
   Widget searchBox() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -106,8 +171,9 @@ class Home extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const TextField(
-        decoration: InputDecoration(
+      child: TextField(
+        onChanged: (value) => _runFilter(value),
+        decoration: const InputDecoration(
           contentPadding: EdgeInsets.all(0),
           prefixIcon: Icon(
             Icons.search,

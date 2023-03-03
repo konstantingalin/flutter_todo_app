@@ -10,8 +10,6 @@ class ToDo {
   });
 
   static List<ToDo> todoList() {
-    return [
-      ToDo(id: 'default', todoText: 'Отметить и удалить эту задачу'),
-    ];
+    return [];
   }
 }

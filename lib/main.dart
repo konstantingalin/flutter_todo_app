@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent)
     );
 
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Flutter Demo',
       home: Home(),
     );
